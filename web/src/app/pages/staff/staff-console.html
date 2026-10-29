@@ -1,0 +1,135 @@
+<header class="bar">
+  <div class="bar-venue">
+    <h1>{{ queue()?.venue?.name ?? 'Your venue' }}</h1>
+    @if (queue(); as q) {
+      <span class="status" [class.status-open]="q.venue.isOpen" [class.status-closed]="!q.venue.isOpen">
+        {{ q.venue.isOpen ? 'Taking tickets' : 'Not taking tickets' }}
+      </span>
+    }
+    @if (!connected()) {
+      <span class="small muted">Reconnecting…</span>
+    }
+  </div>
+  <div class="bar-actions">
+    @if (queue(); as q) {
+      <button class="btn" type="button" [disabled]="busy()" (click)="setOpen(!q.venue.isOpen)">
+        {{ q.venue.isOpen ? 'Stop new tickets' : 'Start taking tickets' }}
+      </button>
+      <a class="btn" [routerLink]="['/display', q.venue.id]" target="_blank" rel="noopener">Open TV screen</a>
+    }
+    <button class="btn btn-quiet" type="button" (click)="auth.logout()">Sign out</button>
+  </div>
+</header>
+
+@if (loadError(); as message) {
+  <div class="page-error">
+    <p class="alert" role="alert">{{ message }}</p>
+    <button class="btn" type="button" (click)="load()">Try again</button>
+  </div>
+} @else if (queue(); as q) {
+  <main class="console">
+    <section class="counter panel" aria-labelledby="counter-title">
+      <div class="counter-head">
+        <h2 id="counter-title" class="visually-hidden">Your counter</h2>
+        <div class="counter-picker" role="radiogroup" aria-label="Which counter are you at?">
+          @for (c of counters; track c) {
+            <button
+              type="button"
+              role="radio"
+              [attr.aria-checked]="c === counter()"
+              [class.active]="c === counter()"
+              (click)="chooseCounter(c)"
+            >
+              {{ c }}
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (current(); as c) {
+        <div class="serving">
+          <p class="serving-label">Now at {{ counter() }}</p>
+          <p class="serving-number num">{{ c.number }}</p>
+          <p class="serving-name">{{ c.customerName }}</p>
+          <p class="small muted">Called {{ minutesSince(c.calledAt!) }} min ago</p>
+        </div>
+        <div class="finish">
+          <button class="btn btn-danger" type="button" [disabled]="busy()" (click)="finish(c, 'NO_SHOW')">
+            Didn't show up <kbd>X</kbd>
+          </button>
+          <button class="btn btn-primary" type="button" [disabled]="busy()" (click)="finish(c, 'SERVED')">
+            Served <kbd>S</kbd>
+          </button>
+        </div>
+      } @else {
+        <div class="serving empty">
+          <p class="serving-label">{{ counter() }} is free</p>
+          <p class="muted">Call the next customer when you're ready.</p>
+        </div>
+      }
+
+      <button class="btn btn-call call" type="button" [disabled]="busy()" (click)="callNext()">
+        Call next customer <kbd>N</kbd>
+      </button>
+      <p class="small muted">Calling the next customer also marks the current one as served.</p>
+
+      @if (actionError(); as message) {
+        <p class="alert" role="alert">{{ message }}</p>
+      }
+      <p class="visually-hidden" aria-live="polite">{{ notice() }}</p>
+    </section>
+
+    <section class="queue" aria-labelledby="waiting-title">
+      <dl class="stats">
+        <div>
+          <dt>Waiting</dt>
+          <dd class="num">{{ q.venue.waitingCount }}</dd>
+        </div>
+        <div>
+          <dt>Wait for a new customer</dt>
+          <dd>{{ formatWait(q.venue.estimatedWaitMinutes) }}</dd>
+        </div>
+        <div>
+          <dt>Last number given</dt>
+          <dd class="num">{{ q.venue.lastIssuedNumber }}</dd>
+        </div>
+      </dl>
+
+      @if (otherCounters().length) {
+        <div class="panel list">
+          <h2 class="list-title">At other counters</h2>
+          <ul>
+            @for (e of otherCounters(); track e.id) {
+              <li>
+                <span class="num list-number">{{ e.number }}</span>
+                <span>{{ e.customerName }}</span>
+                <span class="small muted">{{ e.counter }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+      <div class="panel list">
+        <h2 id="waiting-title" class="list-title">Waiting in line</h2>
+        @if (q.waiting.length === 0) {
+          <p class="muted list-empty">
+            {{ q.venue.isOpen ? 'No one is waiting. New tickets show up here instantly.' : 'No one is waiting, and the venue is not taking new tickets.' }}
+          </p>
+        } @else {
+          <ol>
+            @for (e of q.waiting; track e.id; let first = $first) {
+              <li [class.next]="first">
+                <span class="num list-number">{{ e.number }}</span>
+                <span>{{ e.customerName }}</span>
+                <span class="small muted">waiting {{ minutesSince(e.createdAt) }} min</span>
+              </li>
+            }
+          </ol>
+        }
+      </div>
+    </section>
+  </main>
+} @else {
+  <p class="loading muted">Loading your queue…</p>
+}

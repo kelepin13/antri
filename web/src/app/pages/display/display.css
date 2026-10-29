@@ -1,0 +1,221 @@
+/* The TV board: deep ink, paper-white text, marigold for the number being called.
+   Sized in viewport units so it reads from across a waiting room on any screen. */
+:host {
+  --board: #142033;
+  --board-line: #2a3a54;
+  --board-text: #f3f1ec;
+  --board-dim: #9aa6b8;
+  display: block;
+}
+
+.board {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 3.5vh 4vw;
+  background: var(--board);
+  color: var(--board-text);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 2.5vh;
+  border-bottom: 1px solid var(--board-line);
+}
+
+.head h1 {
+  font-size: clamp(1.5rem, 3.2vw, 3rem);
+  font-weight: 700;
+}
+
+.clock {
+  font-size: clamp(1.5rem, 3.2vw, 3rem);
+  color: var(--board-dim);
+  font-variation-settings: 'wdth' 80;
+  font-weight: 700;
+}
+
+.serving {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 4vw;
+  padding: 4vh 0;
+}
+
+.serving.single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.serving-title {
+  margin-bottom: 2vh;
+  color: var(--board-dim);
+  font-size: clamp(1.25rem, 2.6vh, 2.25rem);
+  font-weight: 600;
+}
+
+.newest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1vh 3vw;
+  animation: call-in 650ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+
+.newest-number {
+  color: var(--marigold);
+  font-size: clamp(9rem, 42vh, 34rem);
+  font-variation-settings: 'wdth' 62;
+  line-height: 0.8;
+}
+
+.newest-counter {
+  display: grid;
+  padding-bottom: 3vh;
+  font-size: clamp(2.5rem, 8vh, 7rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.please {
+  color: var(--board-dim);
+  font-size: clamp(1.1rem, 2.8vh, 2.25rem);
+  font-weight: 500;
+  margin-bottom: 1.25vh;
+}
+
+.recent {
+  align-self: stretch;
+  display: grid;
+  align-content: center;
+  padding-left: 4vw;
+  border-left: 1px solid var(--board-line);
+}
+
+.earlier {
+  display: grid;
+  gap: 2.5vh;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--board-dim);
+  font-size: clamp(1.1rem, 3vh, 2.25rem);
+}
+
+.earlier li {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+}
+
+.earlier .num {
+  min-width: 2.2ch;
+  color: var(--board-text);
+  font-size: clamp(2.5rem, 9vh, 6rem);
+}
+
+.idle-title {
+  max-width: 22ch;
+  font-size: clamp(2rem, 6vh, 4.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.idle-sub {
+  margin-top: 2vh;
+  color: var(--board-dim);
+  font-size: clamp(1.1rem, 2.8vh, 2rem);
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2vh 5vw;
+  padding-top: 2.5vh;
+  border-top: 1px solid var(--board-line);
+  color: var(--board-dim);
+  font-size: clamp(1rem, 2.4vh, 1.75rem);
+}
+
+.foot-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.foot-number {
+  color: var(--board-text);
+  font-size: clamp(2rem, 6vh, 4rem);
+}
+
+.foot-wait {
+  color: var(--board-text);
+  font-weight: 700;
+}
+
+.foot-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  font-size: 0.875rem;
+}
+
+.foot-controls button {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--board-line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--board-dim);
+  font: 500 0.875rem var(--font);
+  cursor: pointer;
+}
+
+.foot-controls button:hover {
+  border-color: var(--board-dim);
+  color: var(--board-text);
+}
+
+.reconnecting {
+  color: var(--marigold);
+}
+
+.board-error,
+.board-loading {
+  align-self: center;
+  max-width: 36ch;
+  font-size: clamp(1.25rem, 3vh, 2rem);
+}
+
+@media (max-width: 900px) {
+  .serving {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .recent {
+    padding: 3vh 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--board-line);
+  }
+
+  .earlier {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5vh 6vw;
+  }
+}
+
+@keyframes call-in {
+  from {
+    opacity: 0;
+    transform: translateY(6vh);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

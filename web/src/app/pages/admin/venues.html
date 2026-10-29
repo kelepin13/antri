@@ -1,0 +1,152 @@
+<div class="page-head">
+  <div>
+    <h1>Venues</h1>
+    @if (venues()) {
+      <p class="muted">
+        {{ totals().waiting }} waiting right now across {{ totals().venues }} {{ totals().venues === 1 ? 'venue' : 'venues' }},
+        {{ totals().issued }} tickets given out today.
+      </p>
+    }
+  </div>
+  <button class="btn btn-primary" type="button" (click)="openEditor(null)">Add venue</button>
+</div>
+
+@if (loadError(); as message) {
+  <div class="page-error">
+    <p class="alert" role="alert">{{ message }}</p>
+    <button class="btn" type="button" (click)="load()">Try again</button>
+  </div>
+}
+
+@if (venues(); as list) {
+  @if (list.length === 0) {
+    <div class="empty panel">
+      <h2>Add your first venue</h2>
+      <p class="muted">A venue is one place with one queue, like a clinic or a service counter. Add it, then create staff accounts for the people who will call numbers there.</p>
+      <button class="btn btn-primary" type="button" (click)="openEditor(null)">Add venue</button>
+    </div>
+  } @else {
+    <div class="panel table-wrap">
+      <table class="table">
+        <caption class="visually-hidden">Venues with live queue and today's numbers</caption>
+        <thead>
+          <tr>
+            <th scope="col">Venue</th>
+            <th scope="col" class="right">Waiting</th>
+            <th scope="col" class="right">Given out today</th>
+            <th scope="col" class="right">Served</th>
+            <th scope="col" class="right">No-shows</th>
+            <th scope="col" class="right">Avg. wait</th>
+            <th scope="col">By hour</th>
+            <th scope="col" class="right">Staff</th>
+            <th scope="col">Status</th>
+            <th scope="col"><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (v of list; track v.id) {
+            <tr>
+              <td>
+                <div class="venue-name">{{ v.name }}</div>
+                <div class="small muted">{{ v.category }}, {{ v.address }}</div>
+              </td>
+              <td class="right"><span class="num cell-number">{{ v.waitingCount }}</span></td>
+              <td class="right">{{ v.today.issued }}</td>
+              <td class="right">{{ v.today.served }}</td>
+              <td class="right" [class.warn]="v.today.noShow > 0">{{ v.today.noShow }}</td>
+              <td class="right">{{ v.today.avgWaitMinutes === null ? '–' : v.today.avgWaitMinutes + ' min' }}</td>
+              <td><app-hourly-bars [values]="v.today.ticketsPerHour" /></td>
+              <td class="right">{{ v.staffCount }}</td>
+              <td>
+                <button
+                  class="status-toggle"
+                  type="button"
+                  [disabled]="rowBusy() === v.id"
+                  (click)="toggleOpen(v)"
+                  [attr.aria-label]="(v.isOpen ? 'Stop new tickets at ' : 'Start taking tickets at ') + v.name"
+                >
+                  <span class="status" [class.status-open]="v.isOpen" [class.status-closed]="!v.isOpen">
+                    {{ v.isOpen ? 'Open' : 'Closed' }}
+                  </span>
+                </button>
+              </td>
+              <td class="row-actions">
+                <a class="btn btn-quiet small" [routerLink]="['/display', v.id]" target="_blank" rel="noopener">TV screen</a>
+                <button class="btn btn-quiet small" type="button" (click)="openEditor(v)">Edit</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="small muted footnote">
+      Waiting counts update live. Avg. wait is the time from taking a number to being called, today.
+    </p>
+  }
+} @else if (!loadError()) {
+  <p class="muted">Loading venues…</p>
+}
+
+<dialog #editor class="editor" (close)="editing.set(null)" aria-labelledby="editor-title">
+  <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <h2 id="editor-title">{{ editing() ? 'Edit ' + editing()!.name : 'Add a venue' }}</h2>
+
+    <div class="field">
+      <label for="v-name">Name</label>
+      <input id="v-name" formControlName="name" placeholder="Klinik Pratama Harapan" />
+      @if (form.controls.name.touched && form.controls.name.invalid) {
+        <span class="error">Give the venue a name (2 to 80 characters)</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="v-category">Type of place</label>
+      <input id="v-category" formControlName="category" placeholder="Clinic, Barbershop, Service counter…" />
+      @if (form.controls.category.touched && form.controls.category.invalid) {
+        <span class="error">Enter what kind of place this is</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="v-address">Address</label>
+      <input id="v-address" formControlName="address" />
+      @if (form.controls.address.touched && form.controls.address.invalid) {
+        <span class="error">Enter the address customers will see</span>
+      }
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="v-avg">Minutes per customer</label>
+        <input id="v-avg" type="number" min="1" max="240" formControlName="avgServiceMinutes" />
+        <span class="hint">Used for wait estimates until real data comes in</span>
+      </div>
+      <div class="field">
+        <label for="v-ahead">Alert customers when</label>
+        <input id="v-ahead" type="number" min="0" max="20" formControlName="notifyAhead" />
+        <span class="hint">this many people are ahead of them</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="v-tz">Time zone</label>
+      <select id="v-tz" formControlName="timezone">
+        @for (tz of timezoneOptions(); track tz) {
+          <option [value]="tz">{{ tz }}</option>
+        }
+      </select>
+      <span class="hint">The queue starts again from number 1 at midnight here</span>
+    </div>
+
+    @if (formError(); as message) {
+      <p class="alert" role="alert">{{ message }}</p>
+    }
+
+    <div class="editor-actions">
+      <button class="btn" type="button" (click)="closeEditor()">Cancel</button>
+      <button class="btn btn-primary" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : editing() ? 'Save changes' : 'Add venue' }}
+      </button>
+    </div>
+  </form>
+</dialog>

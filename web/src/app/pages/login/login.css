@@ -1,0 +1,80 @@
+.login {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 420px);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 6rem);
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 5vw, 4rem);
+}
+
+.wordmark {
+  font-size: clamp(5rem, 14vw, 10rem);
+  color: var(--ink);
+  font-variation-settings: 'wdth' 62;
+  margin-bottom: 1.5rem;
+}
+
+.intro h1 {
+  max-width: 18ch;
+  margin-bottom: 0.75rem;
+}
+
+.lede {
+  max-width: 44ch;
+  color: var(--slate);
+  font-size: var(--t-md);
+  line-height: 1.45;
+}
+
+.card {
+  padding: 2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+form {
+  display: grid;
+  gap: 1rem;
+}
+
+form .btn {
+  width: 100%;
+  min-height: 2.75rem;
+}
+
+.demo {
+  display: grid;
+  gap: 0.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.demo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.demo-buttons .btn {
+  min-height: 2rem;
+  padding: 0 0.625rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .login {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+
+  .wordmark {
+    margin-bottom: 0.75rem;
+  }
+
+  .lede {
+    font-size: var(--t-base);
+  }
+}

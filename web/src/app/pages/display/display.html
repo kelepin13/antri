@@ -1,0 +1,70 @@
+<div class="board">
+  @if (error(); as message) {
+    <p class="board-error">{{ message }}</p>
+  } @else if (venue(); as v) {
+    <header class="head">
+      <h1>{{ v.name }}</h1>
+      <time class="clock num">{{ clock().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</time>
+    </header>
+
+    <main class="serving" [class.single]="earlier().length === 0" aria-live="polite">
+      @if (newest(); as n) {
+        <section class="current">
+          <h2 class="serving-title">Now serving</h2>
+          <!-- Tracked by number + counter, so each newly called number enters with its own animation. -->
+          @for (item of [n]; track item.number + '@' + item.counter) {
+            <div class="newest">
+              <span class="newest-number num">{{ item.number }}</span>
+              <span class="newest-counter">
+                <span class="please">Please go to</span>
+                {{ item.counter }}
+              </span>
+            </div>
+          }
+        </section>
+        @if (earlier().length) {
+          <section class="recent">
+            <h2 class="serving-title">Called earlier</h2>
+            <ul class="earlier">
+              @for (e of earlier(); track e.number) {
+                <li>
+                  <span class="num">{{ e.number }}</span>
+                  <span>{{ e.counter }}</span>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      } @else {
+        <div class="idle">
+          <p class="idle-title">{{ v.isOpen ? 'Next number coming up shortly' : 'We are not taking new tickets right now' }}</p>
+          @if (v.isOpen) {
+            <p class="idle-sub">Take a number in the Antri app and wait wherever you like.</p>
+          }
+        </div>
+      }
+    </main>
+
+    <footer class="foot">
+      <div class="foot-stat">
+        <span class="num foot-number">{{ v.waitingCount }}</span>
+        <span>{{ v.waitingCount === 1 ? 'person waiting' : 'people waiting' }}</span>
+      </div>
+      <div class="foot-stat">
+        <span class="foot-wait">{{ formatWait(v.estimatedWaitMinutes) }}</span>
+        <span>wait if you join now</span>
+      </div>
+      <div class="foot-controls">
+        @if (!connected()) {
+          <span class="reconnecting">Reconnecting…</span>
+        }
+        @if (!soundOn()) {
+          <button type="button" (click)="enableSound()">Turn on sound</button>
+        }
+        <button type="button" (click)="toggleFullscreen()">Full screen</button>
+      </div>
+    </footer>
+  } @else {
+    <p class="board-loading">Connecting to the queue…</p>
+  }
+</div>

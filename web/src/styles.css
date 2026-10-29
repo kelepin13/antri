@@ -1,0 +1,295 @@
+/* Antri dashboard design tokens and shared building blocks.
+   One typeface (Archivo, self-hosted so TV screens work without outside requests); its width axis is the brand device: ticket numbers are
+   set condensed and heavy, everything else at normal width. */
+
+:root {
+  --ink: #1b2a41;
+  --ink-soft: #2c3d57;
+  --mist: #eef1f4;
+  --panel: #ffffff;
+  --line: #d9dee5;
+  --slate: #5b6676;
+  --marigold: #f2a541;
+  --marigold-deep: #b9741a;
+  --teal: #2a9d8f;
+  --teal-deep: #1e776c;
+  --brick: #c8553d;
+
+  --font: 'Archivo Variable', 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 16px;
+
+  /* Type scale (1.25 ratio from 16px) */
+  --t-sm: 0.8125rem;
+  --t-base: 1rem;
+  --t-md: 1.25rem;
+  --t-lg: 1.5625rem;
+  --t-xl: 1.953rem;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--mist);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--t-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: var(--t-xl);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: var(--t-lg);
+}
+
+h3 {
+  font-size: var(--t-md);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--marigold);
+  outline-offset: 2px;
+}
+
+/* Ticket numbers: condensed, heavy, tabular so digits don't shift. */
+.num {
+  font-family: var(--font);
+  font-variation-settings: 'wdth' 70;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+}
+
+.muted {
+  color: var(--slate);
+}
+
+.small {
+  font-size: var(--t-sm);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--ink);
+  font: 600 var(--t-base) / 1 var(--font);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--ink);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--ink-soft);
+}
+
+.btn-call {
+  background: var(--marigold);
+  border-color: var(--marigold);
+  color: var(--ink);
+}
+
+.btn-call:hover:not(:disabled) {
+  border-color: var(--marigold-deep);
+  background: #f5b45e;
+}
+
+.btn-danger {
+  color: var(--brick);
+}
+
+.btn-danger:hover:not(:disabled) {
+  border-color: var(--brick);
+}
+
+.btn-quiet {
+  border-color: transparent;
+  background: transparent;
+}
+
+/* ---- Panels and tables ---- */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-sm);
+}
+
+.table th {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--slate);
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.table .right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Forms ---- */
+.field {
+  display: grid;
+  align-content: start;
+  gap: 0.375rem;
+}
+
+.field label {
+  font-size: var(--t-sm);
+  font-weight: 600;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--ink);
+  font: 400 var(--t-base) var(--font);
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--ink);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(242, 165, 65, 0.45);
+}
+
+.field .hint {
+  color: var(--slate);
+  font-size: var(--t-sm);
+}
+
+.field .error {
+  color: var(--brick);
+  font-size: var(--t-sm);
+}
+
+/* ---- Status ---- */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: var(--t-sm);
+  font-weight: 600;
+}
+
+.status::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-open {
+  color: var(--teal-deep);
+}
+
+.status-closed {
+  color: var(--brick);
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--brick);
+  border-radius: var(--radius-sm);
+  background: #fbeeea;
+  color: #8a3423;
+  font-size: var(--t-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}

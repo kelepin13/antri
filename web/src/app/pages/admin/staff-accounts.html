@@ -1,0 +1,114 @@
+<div class="page-head">
+  <div>
+    <h1>Staff accounts</h1>
+    <p class="muted">People who call numbers at a venue. Each account belongs to one venue.</p>
+  </div>
+  <button class="btn btn-primary" type="button" [disabled]="venues().length === 0" (click)="openEditor()">
+    Add staff account
+  </button>
+</div>
+
+@if (loadError(); as message) {
+  <div class="page-error">
+    <p class="alert" role="alert">{{ message }}</p>
+    <button class="btn" type="button" (click)="load()">Try again</button>
+  </div>
+}
+
+@if (staff(); as list) {
+  @if (venues().length === 0) {
+    <div class="empty panel">
+      <h2>Add a venue first</h2>
+      <p class="muted">Staff accounts belong to a venue. Create one on the Venues page, then come back here.</p>
+    </div>
+  } @else if (list.length === 0) {
+    <div class="empty panel">
+      <h2>No staff accounts yet</h2>
+      <p class="muted">Create an account for each person who will call numbers. Share the email and password with them in person.</p>
+      <button class="btn btn-primary" type="button" (click)="openEditor()">Add staff account</button>
+    </div>
+  } @else {
+    <div class="panel table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Venue</th>
+            <th scope="col">Added</th>
+            <th scope="col"><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of list; track s.id) {
+            <tr>
+              <td class="venue-name">{{ s.name }}</td>
+              <td>{{ s.email }}</td>
+              <td>{{ s.venueName }}</td>
+              <td class="muted">{{ s.createdAt.slice(0, 10) }}</td>
+              <td class="row-actions">
+                <button class="btn btn-quiet btn-danger small" type="button" [disabled]="removing() === s.id" (click)="remove(s)">
+                  Remove
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+} @else if (!loadError()) {
+  <p class="muted">Loading staff accounts…</p>
+}
+
+<dialog #editor class="editor" aria-labelledby="staff-editor-title">
+  <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <h2 id="staff-editor-title">Add a staff account</h2>
+
+    <div class="field">
+      <label for="s-name">Name</label>
+      <input id="s-name" formControlName="name" autocomplete="off" />
+      @if (form.controls.name.touched && form.controls.name.invalid) {
+        <span class="error">Enter their name</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="s-email">Email</label>
+      <input id="s-email" type="email" formControlName="email" autocomplete="off" />
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+        <span class="error">Enter a valid email address</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="s-password">Starting password</label>
+      <input id="s-password" type="text" formControlName="password" autocomplete="new-password" spellcheck="false" />
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <span class="error">Use at least 8 characters</span>
+      } @else {
+        <span class="hint">Shown here so you can pass it on. At least 8 characters.</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="s-venue">Venue</label>
+      <select id="s-venue" formControlName="venueId">
+        @for (v of venues(); track v.id) {
+          <option [value]="v.id">{{ v.name }}</option>
+        }
+      </select>
+    </div>
+
+    @if (formError(); as message) {
+      <p class="alert" role="alert">{{ message }}</p>
+    }
+
+    <div class="editor-actions">
+      <button class="btn" type="button" (click)="closeEditor()">Cancel</button>
+      <button class="btn btn-primary" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Adding…' : 'Add staff account' }}
+      </button>
+    </div>
+  </form>
+</dialog>
